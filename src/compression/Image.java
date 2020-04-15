@@ -38,25 +38,6 @@ public class Image {
         System.out.println("DCT WIDTH = " + dct.getImage().getWidth());
         System.out.println("DCT HEIGHT =" + dct.getImage().getHeight());
 
-        double y[][] = dct.getY();
-
-        for(int i = 0; i < image.getHeight(); i ++)
-        {
-            for(int j = 0; j < image.getWidth(); j++)
-            {
-                int rgb  = image.getRGB(j, i);
-                int blue = rgb & 0xff;
-                int green = (rgb & 0xff00) >> 8;
-                int red = (rgb & 0xff0000) >> 16;
-
-                System.out.print((0.299* red) + (0.587 * green) + (0.114 * blue));
-
-                // this.y[i][j] = (0.299* red) + (0.587 * green) + (0.114 * blue);
-                // this.Cb[i][j] = (0.299 * red) + (0.587 * green) + (0.114 * blue) + 128;
-                // this.Cr[i][j] =  (0.5 * red) - (0.4187 * green) - (0.0813 * blue) + 128;
-            }
-        }
-
         //Mostly for testing.
         Draw originalimage = new Draw(image);
 
