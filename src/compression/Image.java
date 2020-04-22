@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import javax.imageio.*;
 import java.io.File;
 import java.io.IOException;
+import compression.DCT.YCbCr;
 
 public class Image {
     String imagepath;
@@ -15,7 +16,7 @@ public class Image {
 
     public BufferedImage getImageFromPath(String path) {
         try {
-            BufferedImage i = ImageIO.read(new File("src/compression/bliss.png"));
+            BufferedImage i = ImageIO.read(new File("src/compression/depression.png"));
             return i;
         } 
         catch (IOException e) {
@@ -30,7 +31,7 @@ public class Image {
     }
     public static void main(String[] args) {
 
-        BufferedImage image = new Image("src/compression/bliss.png").getImage();
+        BufferedImage image = new Image("src/compression/depression.png").getImage();
 
         DCT dct = new DCT(image);
         System.out.println(image.getWidth());
@@ -39,7 +40,19 @@ public class Image {
         System.out.println("DCT HEIGHT =" + dct.getImage().getHeight());
 
         //Mostly for testing.
-        Draw originalimage = new Draw(image);
+        Draw originalimage = new Draw(image, 0 , 0);
+
+        YCbCr[][] color = dct.getColor();
+        BufferedImage image2 = new BufferedImage(color.length, color[0].length, BufferedImage.TYPE_INT_RGB);
+
+        for(int i = 0; i < color.length; i++) {
+            for(int j = 0; j < color[i].length; j++)
+            {
+                image2.setRGB(i, j, color[i][j].getRGB().getRGB());
+            }
+        }
+
+        Draw yimage = new Draw(image2, 0, 100);
 
     }
 }
