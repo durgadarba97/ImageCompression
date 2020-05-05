@@ -6,7 +6,6 @@ import java.awt.Color;
 
 /*
     TODO:
-    Downsample
     Find DCT
     Relate to quantization table
     Hufmann Encode
@@ -26,11 +25,12 @@ public class DCT {
                                     {49, 64, 78, 87, 103, 121, 120, 101},
                                     {72, 92, 95, 98, 112, 100, 103, 99}};
 
-        BufferedImage originalimage;
-        BufferedImage dctimage;
-        int width;
-        int height;
-        YCbCr[][] color;
+    BufferedImage originalimage;
+    BufferedImage dctimage;
+    int width;
+    int height;
+    YCbCr[][] color;
+    double[][] dct;
 
     public DCT(BufferedImage image) {
         this.originalimage = image;
@@ -45,6 +45,7 @@ public class DCT {
         setColorSpace();
         downsample();
         transform();
+        quantization();
     }
 
     public BufferedImage checkPadding(BufferedImage i) {
@@ -90,6 +91,8 @@ public class DCT {
 
     }
 
+    // This downsamples the image in a 4:1:1 YCbCr.
+    // gets to the idea that we see brightness a lot better than we see Color.
     public void downsample() {
         for(int i = 0; i < this.color.length/2; i+=2) 
         {
@@ -109,132 +112,11 @@ public class DCT {
 
             }
         }
-
-        // for(int i = 10; i < 12; i++)
-        // {
-        //     for(int j = 10; j < 12; j++)
-        //     {
-        //         System.out.println("Y, Cb, Cr: " + this.color[i][j].Y + ", " + this.color[i][j].Cb + ", " + this.color[i][j].Cr);
-        //     }
-        // }
     }
 
-    // public void setSubArray() {
-    //     double[][] ycumulative = new double[this.height / 8][this.width / 8];
-    //     double[][] cbcumulative = new double[this.width][this.height];
-    //     double[][] crcumulative = new double[this.width][this.height];
-    //     int subi = 0;
-    //     int subj = 0;
-
-    //     for(int i = 0; i < this.color.length; i++) 
-    //     {
-    //         for(int j = 0; j < this.color[i].length; j++)
-    //         {
-    //             int cj = j / 8;
-    //             int ci = i / 8;
-    //             ycumulative[ci][cj] = ycumulative[ci][cj] + this.color[i][j].Y;
-
-
-
-    //             if(ci == 0 && cj == 0)
-    //             {
-    //                 System.out.println(this.color[i][j].Y);
-    //             }
-    //         }
-    //     }
-        
-
-    //     System.out.println("++++++++++++++++++++++++++++++++=");
-    //     System.out.println("length: " + ycumulative[0].length);
-    //     for(int i = 0; i < ycumulative.length; i++)
-    //     {
-    //         for(int j = 0; j < ycumulative[i].length; j++)
-    //         {
-    //             System.out.println(ycumulative[i][j]);
-    //         }
-    //     }
-    // }
-
-    // public void transform() {
-    //     int u;
-    //     int v;
-    //     double alphau;
-    //     double alphav;
-
-    //     double[][] test = {
-    //         {52, 55, 61, 66, 70, 61, 64, 73},   
-    //         {63, 59, 55, 90, 109, 85, 69, 72},
-    //         {62, 59, 68, 113, 144, 104, 66, 73},
-    //         {63, 58, 71, 122, 154, 106, 70, 69}, 
-    //         {67, 61, 68, 104, 126, 88, 68, 70},  
-    //         {79, 65, 60, 70, 77, 68, 58, 75},
-    //         {85, 71, 64, 59, 55, 61, 65, 83},
-    //         {87, 79, 69, 68, 65, 76, 78, 94}
-    //     };
-
-    //     double summation = 0;
-    //     double[][] coefficients = new double[8][8];
-
-    //     for(int x = 0; x < test.length; x++) 
-    //     {
-
-    //         for(int y = 0; y < test[x].length; y++)
-    //         {
-    //             //Inner discrete transform.
-    //             u = x % 8;
-    //             v = y % 8;
-
-    //             double cosu = Math.cos(((((2 * x) + 1) * u * Math.PI) / 16));
-    //             double cosv = Math.cos(((((2 * y) + 1) * v * Math.PI) / 16));
-
-    //             summation = ((test[x][y]) * cosu * cosv) + summation;
-    //             System.out.print(test[x][y] - 128 + ", ");
-
-    //             alphau = 1.0;
-    //             alphav = 1.0;
-    
-    //             if(u == 0) {
-    //                 alphav = 1 / Math.sqrt(2);
-    //             }
-    //             if(v == 0) {
-    //                 alphau = 1 / Math.sqrt(2);
-    //             }
-
-    //             coefficients[u][v] = .25 * alphau * alphav * summation;
-    //         }
-    //         System.out.println("");
-    //     }
-        
-    //     System.out.println("");
-
-    //     for(int i = 0; i < 8; i++)
-    //     {
-    //         for(int j = 0; j < 8; j++) 
-    //         {
-    //             //Outer discrete transform.
-    //             // alphau = 1.0;
-    //             // alphav = 1.0;
-    
-    //             // if(i == 0) {
-    //             //     alphav = 1 / Math.sqrt(2);
-    //             // }
-    //             // if(j == 0) {
-    //             //     alphau = 1 / Math.sqrt(2);
-    //             // }
-
-    //             // coefficients[i][j] = .25 * alphau * alphav * summation;
-
-    //             System.out.print((int)coefficients[i][j] + ", ");
-    //         }
-    //         System.out.println("");
-    //     }
-
-    // }
-
-
+    //Does the Discrete Cosine Transform.
+    //TODO: make it use a full image. Not just 8 by 8.
     public void transform() {
-        int i, j, k, l;
-
 
         double[][] matrix = {
             {52, 55, 61, 66, 70, 61, 64, 73},   
@@ -247,54 +129,72 @@ public class DCT {
             {87, 79, 69, 68, 65, 76, 78, 94}
         };
 
-        int m = 8;
-        int n = 8;
-
         // dct will store the discrete cosine transform
-        double[][] dct = new double[m][n];
+        this.dct = new double[8][8];
 
-        double ci, cj, dct1, sum;
+        double au, av, sum;
 
-        for (i = 0; i < m; i++)
+        for (int i = 0; i < 8; i++)
         {
-            for (j = 0; j < n; j++)
+            for (int j = 0; j < 8; j++)
             {
                 // ci and cj depends on frequency as well as
                 // number of row and columns of specified matrix
                 if (i == 0)
-                    ci = 1 / Math.sqrt(m);
+                    au = 1 / Math.sqrt(2);
                 else
-                    ci = Math.sqrt(2) / Math.sqrt(m);
+                    au = 1;
 
                 if (j == 0)
-                    cj = 1 / Math.sqrt(n);
+                    av = 1 / Math.sqrt(2);
                 else
-                    cj = Math.sqrt(2) / Math.sqrt(n);
+                    av = 1;
 
                 // sum will temporarily store the sum of
                 // cosine signals
                 sum = 0;
-                for (k = 0; k < m; k++)
+                for (int x = 0; x < 8; x++)
                 {
-                    for (l = 0; l < n; l++)
+                    for (int y = 0; y < 8; y++)
                     {
-                        dct1 = (matrix[k][l] - 128) *
-                                Math.cos((2 * k + 1) * i * Math.PI / (2 * m)) *
-                                Math.cos((2 * l + 1) * j * Math.PI / (2 * n));
-                        sum = sum + dct1;
+                        sum = (matrix[x][y] - 128) *
+                                Math.cos((2 * x + 1) * i * Math.PI / (16)) *
+                                Math.cos((2 * y + 1) * j * Math.PI / (16)) + sum;
                     }
                 }
-                dct[i][j] = ci * cj * sum;
+                this.dct[i][j] = (0.25) * au * av * sum;
             }
         }
 
-        for (i = 0; i < m; i++)
+        for (int i = 0; i < 8; i++)
         {
-            for (j = 0; j < n; j++)
-                System.out.printf("%f\t", dct[i][j]);
+            for (int j = 0; j < 8; j++)
+                System.out.printf("%f\t", this.dct[i][j]);
             System.out.println();
         }
     }
+
+    // This is where the true downscaling of the image happens. 
+    // Downscales image by given quantization amount.
+    public void quantization() {
+
+        for(int i = 0; i < this.dct.length; i++)
+        {
+            for(int j = 0; j < this.dct[i].length; j++)
+            {
+                this.dct[i][j] = Math.round(this.dct[i][j] / quantization[i % 8][j % 8]);
+            }
+        }
+
+        System.out.println("QUANTIZATION::::");
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+                System.out.printf("%f\t", this.dct[i][j]);
+            System.out.println();
+        }
+    }
+
     public YCbCr[][] getColor() {
         return this.color;
     }
