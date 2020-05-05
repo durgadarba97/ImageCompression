@@ -43,8 +43,8 @@ public class DCT {
 
         this.color = new YCbCr[this.width][this.height];
         setColorSpace();
-        // downsample();
-        // transform();
+        downsample();
+        transform();
     }
 
     public BufferedImage checkPadding(BufferedImage i) {
@@ -91,24 +91,24 @@ public class DCT {
     }
 
     public void downsample() {
-        // for(int i = 0; i < this.color.length/2; i+=2) 
-        // {
-        //     for(int j = 0; j < this.color[i].length/2; j+=2)
-        //     {
-        //         double avgcb = (this.color[i][j].Cb + this.color[i][j+1].Cb + this.color[i+1][j].Cb + this.color[i+1][j+1].Cb) / 4;
-        //         double avgcr = (this.color[i][j].Cr + this.color[i][j+1].Cr + this.color[i+1][j].Cr + this.color[i+1][j+1].Cr) / 4;
+        for(int i = 0; i < this.color.length/2; i+=2) 
+        {
+            for(int j = 0; j < this.color[i].length/2; j+=2)
+            {
+                double avgcb = (this.color[i][j].Cb + this.color[i][j+1].Cb + this.color[i+1][j].Cb + this.color[i+1][j+1].Cb) / 4;
+                double avgcr = (this.color[i][j].Cr + this.color[i][j+1].Cr + this.color[i+1][j].Cr + this.color[i+1][j+1].Cr) / 4;
 
-        //         this.color[i][j].Cb = avgcb;
-        //         this.color[i][j].Cr = avgcr;
-        //         this.color[i][j+1].Cb = avgcb;
-        //         this.color[i][j+1].Cr = avgcr;
-        //         this.color[i+1][j].Cb = avgcb;
-        //         this.color[i+1][j].Cr = avgcr;
-        //         this.color[i+1][j+1].Cb = avgcb;
-        //         this.color[i+1][j+1].Cr = avgcr;
+                this.color[i][j].Cb = avgcb;
+                this.color[i][j].Cr = avgcr;
+                this.color[i][j+1].Cb = avgcb;
+                this.color[i][j+1].Cr = avgcr;
+                this.color[i+1][j].Cb = avgcb;
+                this.color[i+1][j].Cr = avgcr;
+                this.color[i+1][j+1].Cb = avgcb;
+                this.color[i+1][j+1].Cr = avgcr;
 
-        //     }
-        //}
+            }
+        }
 
         // for(int i = 10; i < 12; i++)
         // {
@@ -155,32 +155,151 @@ public class DCT {
     //     }
     // }
 
+    // public void transform() {
+    //     int u;
+    //     int v;
+    //     double alphau;
+    //     double alphav;
+
+    //     double[][] test = {
+    //         {52, 55, 61, 66, 70, 61, 64, 73},   
+    //         {63, 59, 55, 90, 109, 85, 69, 72},
+    //         {62, 59, 68, 113, 144, 104, 66, 73},
+    //         {63, 58, 71, 122, 154, 106, 70, 69}, 
+    //         {67, 61, 68, 104, 126, 88, 68, 70},  
+    //         {79, 65, 60, 70, 77, 68, 58, 75},
+    //         {85, 71, 64, 59, 55, 61, 65, 83},
+    //         {87, 79, 69, 68, 65, 76, 78, 94}
+    //     };
+
+    //     double summation = 0;
+    //     double[][] coefficients = new double[8][8];
+
+    //     for(int x = 0; x < test.length; x++) 
+    //     {
+
+    //         for(int y = 0; y < test[x].length; y++)
+    //         {
+    //             //Inner discrete transform.
+    //             u = x % 8;
+    //             v = y % 8;
+
+    //             double cosu = Math.cos(((((2 * x) + 1) * u * Math.PI) / 16));
+    //             double cosv = Math.cos(((((2 * y) + 1) * v * Math.PI) / 16));
+
+    //             summation = ((test[x][y]) * cosu * cosv) + summation;
+    //             System.out.print(test[x][y] - 128 + ", ");
+
+    //             alphau = 1.0;
+    //             alphav = 1.0;
+    
+    //             if(u == 0) {
+    //                 alphav = 1 / Math.sqrt(2);
+    //             }
+    //             if(v == 0) {
+    //                 alphau = 1 / Math.sqrt(2);
+    //             }
+
+    //             coefficients[u][v] = .25 * alphau * alphav * summation;
+    //         }
+    //         System.out.println("");
+    //     }
+        
+    //     System.out.println("");
+
+    //     for(int i = 0; i < 8; i++)
+    //     {
+    //         for(int j = 0; j < 8; j++) 
+    //         {
+    //             //Outer discrete transform.
+    //             // alphau = 1.0;
+    //             // alphav = 1.0;
+    
+    //             // if(i == 0) {
+    //             //     alphav = 1 / Math.sqrt(2);
+    //             // }
+    //             // if(j == 0) {
+    //             //     alphau = 1 / Math.sqrt(2);
+    //             // }
+
+    //             // coefficients[i][j] = .25 * alphau * alphav * summation;
+
+    //             System.out.print((int)coefficients[i][j] + ", ");
+    //         }
+    //         System.out.println("");
+    //     }
+
+    // }
+
+
     public void transform() {
-        //Goes through rows of outer array
-        for(int i = 0; i < this.color.length; i+=8)
+        int i, j, k, l;
+
+
+        double[][] matrix = {
+            {52, 55, 61, 66, 70, 61, 64, 73},   
+            {63, 59, 55, 90, 109, 85, 69, 72},
+            {62, 59, 68, 113, 144, 104, 66, 73},
+            {63, 58, 71, 122, 154, 106, 70, 69}, 
+            {67, 61, 68, 104, 126, 88, 68, 70},  
+            {79, 65, 60, 70, 77, 68, 58, 75},
+            {85, 71, 64, 59, 55, 61, 65, 83},
+            {87, 79, 69, 68, 65, 76, 78, 94}
+        };
+
+        int m = 8;
+        int n = 8;
+
+        // dct will store the discrete cosine transform
+        double[][] dct = new double[m][n];
+
+        double ci, cj, dct1, sum;
+
+        for (i = 0; i < m; i++)
         {
-            //goes through columns of outer array
-            for(int j = 0; j < this.color[i].length; j+=8)
+            for (j = 0; j < n; j++)
             {
-                //goes through individual pixels of subarray
-                for(int k = i; k < 8+i; k++) 
+                // ci and cj depends on frequency as well as
+                // number of row and columns of specified matrix
+                if (i == 0)
+                    ci = 1 / Math.sqrt(m);
+                else
+                    ci = Math.sqrt(2) / Math.sqrt(m);
+
+                if (j == 0)
+                    cj = 1 / Math.sqrt(n);
+                else
+                    cj = Math.sqrt(2) / Math.sqrt(n);
+
+                // sum will temporarily store the sum of
+                // cosine signals
+                sum = 0;
+                for (k = 0; k < m; k++)
                 {
-                    for(int l = j; l < 8+j; l++)
+                    for (l = 0; l < n; l++)
                     {
-                        System.out.println("k " + k + ",l " + l);
+                        dct1 = (matrix[k][l] - 128) *
+                                Math.cos((2 * k + 1) * i * Math.PI / (2 * m)) *
+                                Math.cos((2 * l + 1) * j * Math.PI / (2 * n));
+                        sum = sum + dct1;
                     }
                 }
-                System.out.println("============");
+                dct[i][j] = ci * cj * sum;
             }
         }
-    }
 
+        for (i = 0; i < m; i++)
+        {
+            for (j = 0; j < n; j++)
+                System.out.printf("%f\t", dct[i][j]);
+            System.out.println();
+        }
+    }
     public YCbCr[][] getColor() {
         return this.color;
     }
 
-    public int[][] getQTable()
-    {
+    public int[][] getQTable() {
         return this.quantization;
     }
     public BufferedImage getImage() {
@@ -188,9 +307,9 @@ public class DCT {
     }
 
     public class YCbCr {
-        public float Cb;
-        public float Cr;
-        public float Y;
+        public double Cb;
+        public double Cr;
+        public double Y;
 
         public YCbCr(float b, float r, float y) {
             this.Y = y;
@@ -198,16 +317,16 @@ public class DCT {
             this.Cb = b;
         }
 
-        public YCbCr(float r, float b, float g, String s) {
+        public YCbCr(double r, double b, double g, String s) {
             if(s == "rgb") {
 
                 r = r / 255;
                 g = g / 255;
                 b = b / 255;
 
-                this.Y = ((float) 0.299* r) + ((float) 0.587 * g) + ((float) 0.114 * b);
-                this.Cb = ((float) -0.168736 * r ) - ((float) 0.331264 * g) + ((float) 0.5 * b);
-                this.Cr =  ((float) 0.5 * r) - ((float) 0.418688 * g) - ((float) 0.081312 * b);
+                this.Y = (0.299* r) + (0.587 * g) + (0.114 * b);
+                this.Cb = (-0.168736 * r ) - (0.331264 * g) + (0.5 * b);
+                this.Cr =  (0.5 * r) - (0.418688 * g) - (0.081312 * b);
 
                 // this.Y = (this.Y * 219) + 16;
                 // this.Cb = (this.Cb * 224) + 128;
@@ -215,23 +334,21 @@ public class DCT {
             }
         }
         public Color getRGB() {
-            float r = (float)this.Y + ((float) 1.402 * (float)this.Cr);
-            float g = (float)this.Y - ((float) 0.344136 * (float) this.Cb) - ((float) 0.714136 * (float)this.Cr);
-            float b = (float)this.Y + ((float) 1.772 * (float)this.Cb);
+            double r = this.Y + (1.402 * this.Cr);
+            double g = this.Y - (0.344136 * this.Cb) - (0.714136 * this.Cr);
+            double b = this.Y + (1.772 * this.Cb);
 
             // System.out.println("R : " + r);
             // System.out.println("G : " + g);
             // System.out.println("B : " + b);
 
-
-            // r = Math.max((float) 0, Math.min((float) 255, r));
-            // g = Math.max((float) 0, Math.min((float) 255, g));
-            // b = Math.max((float) 0, Math.min((float) 255, b));
-
-
             r = r * 255;
             g = g * 255;
             b = b * 255;
+
+            r = Math.max(0, Math.min(255, r));
+            g = Math.max(0, Math.min(255, g));
+            b = Math.max(0, Math.min(255, b));
 
             // System.out.println("NEW RGB = " + r);
 

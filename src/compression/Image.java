@@ -16,7 +16,7 @@ public class Image {
 
     public BufferedImage getImageFromPath(String path) {
         try {
-            BufferedImage i = ImageIO.read(new File("src/compression/depression.png"));
+            BufferedImage i = ImageIO.read(new File("src/compression/bliss.png"));
             return i;
         } 
         catch (IOException e) {
@@ -31,7 +31,7 @@ public class Image {
     }
     public static void main(String[] args) {
 
-        BufferedImage image = new Image("src/compression/depression.png").getImage();
+        BufferedImage image = new Image("src/compression/bliss.png").getImage();
 
         DCT dct = new DCT(image);
         System.out.println(image.getWidth());
