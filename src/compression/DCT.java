@@ -46,6 +46,7 @@ public class DCT {
         downsample();
         transform();
         quantization();
+        encode();
     }
 
     public BufferedImage checkPadding(BufferedImage i) {
@@ -192,6 +193,62 @@ public class DCT {
             for (int j = 0; j < 8; j++)
                 System.out.printf("%f\t", this.dct[i][j]);
             System.out.println();
+        }
+    }
+
+    public void encode() {
+        int i = 0; 
+        int j = 0;
+        int c = 0;
+        boolean half = true;
+
+        System.out.println(this.dct[i][j]);
+        j++;
+        c++;
+
+        while(c >= 0)
+        {
+            //While loop for going in the y = x + c direction
+            while(j >= 0)
+            {
+                System.out.print(dct[i][j] + ", ");
+                j = j - 1;
+                i = i + 1;
+            }
+            System.out.println("");
+
+            if(c == 7)
+            {
+                half = false;
+            } 
+
+            if(half)
+            {
+                c++; 
+            }
+            else {
+                c--;
+            }
+            i = c;
+            j = 0;
+
+            //While loop for going in the y = x + c direction
+            while(i >= 0)
+            {
+                System.out.print(dct[i][j] + ", ");
+                j = j + 1;
+                i = i - 1;
+            }
+            System.out.println("");
+
+            if(half) {
+                c++; 
+            }
+            else {
+                c--;
+            }
+            j = c;
+            i = 0;
         }
     }
 
