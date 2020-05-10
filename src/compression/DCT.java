@@ -197,59 +197,73 @@ public class DCT {
     }
 
     public void encode() {
-        int i = 0; 
-        int j = 0;
-        int c = 0;
-        boolean half = true;
-
-        System.out.println(this.dct[i][j]);
-        j++;
-        c++;
-
-        while(c >= 0)
+        // Matrix for testing. 
+        // int[][] test = {
+        //         {1, 2,  6,  7,  15, 16, 28, 29},
+        //         {3, 5,  8, 14,  17, 27, 30, 43},
+        //         {4, 9, 13, 18,  26, 31, 42, 44},
+        //         {10,12, 19, 25, 32, 41, 45, 54},
+        //         {11,20, 24, 33, 40, 46, 53, 55},
+        //         {21,23, 34, 39, 47, 52, 56, 61},
+        //         {22,35, 38, 48, 51, 57, 60, 62},
+        //         {36,37, 49, 50, 58, 59, 63, 64}
+        //     };
+        
+        boolean firsthalf = true;
+        int x = 0;
+        int y = 0;
+        int cx = 0;
+        int cy = 0;
+        System.out.println(this.dct[x][y]);
+        y++;
+        cx++;
+        
+        while(cx * cy <= 64)
         {
-            //While loop for going in the y = x + c direction
-            while(j >= 0)
+            // while loop to go down and to the left
+            while(y >= 0 && y < 8 && x >= 0 && x < 8)
             {
-                System.out.print(dct[i][j] + ", ");
-                j = j - 1;
-                i = i + 1;
+                System.out.print(this.dct[x][y] + ", ");
+                x = x + 1;
+                y = y - 1;
             }
             System.out.println("");
+            if(cx == 7)
+                firsthalf = false;
 
-            if(c == 7)
-            {
-                half = false;
-            } 
-
-            if(half)
-            {
-                c++; 
+            if(firsthalf) {
+                cx++;
+                x = cx;
+                y = 0;
+            } else {
+                cy++;
+                x = 7;
+                y = cy;
             }
-            else {
-                c--;
-            }
-            i = c;
-            j = 0;
 
-            //While loop for going in the y = x + c direction
-            while(i >= 0)
+            //while loop to go up and the right 
+            while(x >= 0 && x < 8 && y < 8 && y >= 0) 
             {
-                System.out.print(dct[i][j] + ", ");
-                j = j + 1;
-                i = i - 1;
+                System.out.print(this.dct[x][y] + ", ");
+                x = x - 1;
+                y = y + 1;
             }
             System.out.println("");
+            // cx++;
+            // y = cx;
+            // x = 0;
 
-            if(half) {
-                c++; 
+            if(firsthalf) {
+                cx++;
+                y = cx;
+                x = 0;
+            } else {
+                cy++;
+                y = 7;
+                x = cy;
             }
-            else {
-                c--;
-            }
-            j = c;
-            i = 0;
         }
+
     }
 
     public YCbCr[][] getColor() {
